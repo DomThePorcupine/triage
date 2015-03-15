@@ -14,7 +14,7 @@ if not ".triage" in filename:
 	filename = filename+ ".triage"
 
 #Create the triage file
-txtfile = open(filename + ".triage", "w")
+txtfile = open(filename, "w")
 
 #Check that dmidecode is installed
 try:
@@ -80,7 +80,7 @@ print "--------------------------"
 txtfile.write("--------------------------\n")
 
 print "Video Devices:"
-txtfile.write("Video Devices:")
+txtfile.write("Video Devices:\n")
 if VGA:
 	print "-VGA"
 	txtfile.write(" VGA\n")
@@ -105,6 +105,7 @@ if USB:
 if PS2:
 	print "-PS/2"
 	txtfile.write(" PS/2\n")
+	
 print "--------------------------"
 txtfile.write("--------------------------\n")
 
@@ -117,48 +118,76 @@ data2 = data2.split(" ")
 print "Hard Drive: " + data2[2] + "GB"
 txtfile.write("Hard Drive: " + data2[2] + "GB\n")
 
-cdrom = subprocess.check_output(['cat', '/proc/sys/dev/cdrom/info'])
-cdrom = cdrom.splitlines()
+#variables for possible cd/dvd configurations 
 CD=False
 DVD=False
 CDR=False
 DVDR=False
-for line in cdrom:
-	if "play audio" in line and '1' in line:
-		CD=True
-	if "read DVD" in line and '1' in line:
-		DVD=True
-	if "write DVD-R" in line and '1' in line:
-		DVDR=True
-	if "write CD-RW" in line and '1' in line:
-		CDR=True
+#NEEDS TO BE TESTED ON A COMPUTER WITHOUT A CD DRIVE
+#I have a feeling the file would not exist so I
+#wrapped it in a try except block, if it fails
+#we assume there is no CD drive
+try: 
+	cdrom = subprocess.check_output(['cat', '/proc/sys/dev/cdrom/info'])
+	cdrom = cdrom.splitlines()
+	for line in cdrom:
+		if "play audio" in line and '1' in line:
+			CD=True
+		if "read DVD" in line and '1' in line:
+			DVD=True
+		if "write DVD-R" in line and '1' in line:
+			DVDR=True
+		if "write CD-RW" in line and '1' in line:
+			CDR=True
+except:
+	CD=False
+	DVD=False
+	CDR=False
+	DVDR=False
+		
 print "--------------------------"
 txtfile.write("--------------------------\n")
+
+#if we can read cds and not dvds
 if CD and not DVD:
 	print "CD/DVD Drive: CD"
 	txtfile.write("CD/DVD Drive: CD\n")
+#if we can read, but not write cd/dvd
 if CD and DVD and not CDR and not DVDR:
 	print "CD/DVD Drive: CD-DVD"
 	txtfile.write("CD/DVD Drive: CD-DVD\n")
+#assumes that if we can write we can read
+#if we can write cd but not dvd
 if CDR and DVD and not DVDR:
 	print "CD/DVD Drive: CD-RW/DVD"
 	txtfile.write("CD/DVD Drive: CD-RW/DVD\n")
+#if we can write both
 if CDR and DVDR:
 	print "CD/DVD Drive: CD_RW/DVD-RW"
 	txtfile.write("CD/DVD Drive: CD_RW/DVD-RW\n")
+#if it has no CD/DVD drive
+if not CD and not CDR and not DVD and not DVDR:
+	print "CD/DVD Drive: N/A"
+	txtfile.write("CD/DVD Drive: N/A\n")
 
-print "--------------------------"
-txtfile.write("--------------------------\n")
+
 
 #This code is Ubuntu specific, if using another os it will 
 #throw an error
-osversion = subprocess.check_output(['more', '/etc/lsb-release'])
-osversion = osversion.splitlines()
-for line in osversion:
-	if "RELEASE" in line:
-		os = line
-print "Final Ubuntu OS: " + os.replace("DISTRIB_RELEASE=","")
-txtfile.write("Final Ubuntu OS: " + os.replace("DISTRIB_RELEASE=","")+ "\n")
+try:
+	osversion = subprocess.check_output(['more', '/etc/lsb-release'])
+	osversion = osversion.splitlines()
+	for line in osversion:
+		if "RELEASE" in line:
+			os = line
+	print "--------------------------"
+	txtfile.write("--------------------------\n")
+	print "Final Ubuntu OS: " + os.replace("DISTRIB_RELEASE=","")
+	txtfile.write("Final Ubuntu OS: " + os.replace("DISTRIB_RELEASE=","")+ "\n")
+except:
+	print "Not an ubuntu os, tell Kevin. Program exiting!"
+	exit
+
 
 print "--------------------------"
 txtfile.write("--------------------------\n")
@@ -202,8 +231,13 @@ else:
 print "--------------------------"
 txtfile.write("--------------------------\n")
 txtfile.close()
+
 #The following command basically gives you a bash shell
 #anything in " " will get executed as if you typed it into the terminal
-#example os.system("echo \"you are my only sunshine\" >> afile.txt")
-#filename = file.triage that is created
-#os.system("scp " + filename + "10.0.88.)
+
+#Here is the command taken from your email with the quotes/everything working
+#I cannot test it here but maybe you can
+#192.168.1.28 is for my house, testing locally, please ignore
+#os.system("lftp -e \"cd /Public/triage/;put "+filename+";exit\" 192.168.1.28")
+os.system("lftp -e \"cd /Public/triage/;put "+filename+";exit\" 10.0.88.5")
+
