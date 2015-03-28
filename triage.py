@@ -2,7 +2,8 @@
 import subprocess
 import sys
 import os
-
+#lftp is not installed by default
+subprocess.call(['sudo', 'apt-get', 'install', 'lftp'])
 #Check if the triage sheet was entered as a command line argument
 if len(sys.argv) > 1:
 	filename = sys.argv[1]
