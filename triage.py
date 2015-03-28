@@ -7,7 +7,7 @@ import os
 try:
 	subprocess.check_ouput(['lftp','--version'])
 except:
-	subprocess.call(['sudo', 'apt-get', 'install', 'lftp'])
+	os.system('sudo apt-get install lftp > /dev/null')
 #Check that dmidecode is installed
 try:
 	subprocess.check_output(['dmidecode', '--version'])
@@ -26,53 +26,80 @@ if not ".triage.txt" in filename:
 
 #Create the triage file
 txtfile = open(filename, "w")
-
-print "--------------------------"
-txtfile.write("--------------------------\n")
 #After looking at some computers I have decided to add an extra part to this script
 #If the computer is not made by a main brand such as dell, ibm, hp, or lenovo
 #The script will suggest manually entering certain values
 #such as the serial number
+manuCheck = True
 mainCheck = subprocess.check_output(['sudo','dmidecode','-t','system'])
 data = mainCheck.splitlines()
 for line in data:
 	if "Manufacturer" in line:
-		if not "Dell" in line or not "HP" in line or not "IBM" in line:
+		#We will need to add to this line as we find how accurate different computers are
+		#For now we are only going to trust name brands
+		if not "Dell" in line or not "HP" in line or not "IBM" in line or not "Lenovo" in line:
 			print "This computer seems to be a non common computer!"
 			print "It is suggested that you enter certain data manually!"
-			exit
+			
+			manufact = raw_input("Please enter the manufacturer's name (example: Dell): ")
+			model = raw_input("Please enter the model name: ")
+			serialnum = raw_input("Please enter the serial number: ")
+                        print "--------------------------"
+                        txtfile.write("--------------------------\n")
+			
+
+			print "Manufacturer: "+manufact
+			txtfile.write("Manufacturer: "+manufact+'\n')
+                        print "--------------------------"
+                        txtfile.write("--------------------------\n")
+
+			print "Model: "+model
+			txtfile.write("Model: "+model+'\n')
+			print "--------------------------"
+                        txtfile.write("--------------------------\n")
+
+			print "Serial Number: "+serialnum
+			txtfile.write("Serial Number: "+serialnum+'\n')
+			manuCheck = False
 
 #parsing output of dmidecode for manufacturer, model, and Serial number
-manu = subprocess.check_output(['sudo', 'dmidecode', '-t', 'system'])
-data = manu.splitlines()
-for line in data:
-	if "Manufacturer" in line:
-		print line.replace('\t','')
-		txtfile.write(line.replace('\t','')+"\n")
-		print "--------------------------"
-		txtfile.write("--------------------------\n")
-	if "Version" in line:
-		line = line.replace('\t','')
-		print line.replace("Version", "Model")
-		txtfile.write(line.replace("Version", "Model")+ "\n")
-		print "--------------------------"
-		txtfile.write("--------------------------\n")
-	if "Serial" in line:
-		print line.replace('\t','')
-		txtfile.write(line.replace('\t','') + "\n")
+if manuCheck:
+	manu = subprocess.check_output(['sudo', 'dmidecode', '-t', 'system'])
+	data = manu.splitlines()
+	for line in data:
+		if "Manufacturer" in line:
+                        print "--------------------------"
+                        txtfile.write("--------------------------\n")
+			print line.replace('\t','')
+			txtfile.write(line.replace('\t','')+"\n")
+			print "--------------------------"
+			txtfile.write("--------------------------\n")
+		if "Version" in line:
+			line = line.replace('\t','')
+			print line.replace("Version", "Model")
+			txtfile.write(line.replace("Version", "Model")+ "\n")
+			print "--------------------------"
+			txtfile.write("--------------------------\n")
+		if "Serial" in line:
+			print line.replace('\t','')
+			txtfile.write(line.replace('\t','') + "\n")
 #variables for hardware devices
 USB = False
 ETHERNET = False
 VGA = False
 DVI = False
 HDMI = False
-#PS2 is not currently checked for
-#for some strange reason I can't find
-#a way to list ports from the terminal
 PS2 = False
 WIFI = False
+#add firewire
 
 #parsing lspci for hardware devices
+PS = subprocess.check_output(['sudo', 'dmidecode'])
+data = PS.splitlines()
+for line in data:
+	if "PS/2" in line:
+		PS2=True
+
 data = subprocess.check_output(['lspci'])
 data = data.splitlines()
 for line in data:
@@ -98,13 +125,13 @@ print "Video Devices:"
 txtfile.write("Video Devices:\n")
 if VGA:
 	print "-VGA"
-	txtfile.write(" VGA\n")
+	txtfile.write("-VGA\n")
 if DVI:
 	print "-DVI"
-	txtfile.write(" DVI\n")
+	txtfile.write("-DVI\n")
 if HDMI:
 	print "-HDMI"
-	txtfile.write(" HDMI\n")
+	txtfile.write("-HDMI\n")
 	
 print "--------------------------"
 txtfile.write("--------------------------\n")
@@ -113,13 +140,13 @@ print "Ports:"
 txtfile.write("Ports:\n")
 if ETHERNET:
 	print "-ETHERNET"
-	txtfile.write(" ETHERNET\n")
+	txtfile.write("-ETHERNET\n")
 if USB:
 	print "-USB"
-	txtfile.write(" USB\n")
+	txtfile.write("-USB\n")
 if PS2:
 	print "-PS/2"
-	txtfile.write(" PS/2\n")
+	txtfile.write("-PS/2\n")
 	
 print "--------------------------"
 txtfile.write("--------------------------\n")
@@ -260,5 +287,4 @@ txtfile.close()
 executeThis = " -e \'cd /Public/triage;put " + filename + ";exit\'"
 print executeThis
 os.system("lftp 10.0.88.5" + executeThis)
-#subprocess.call(['lftp', '10.0.88.5', executeThis]) 
 
