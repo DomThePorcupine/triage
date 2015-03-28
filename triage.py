@@ -10,8 +10,8 @@ else:
 	filename = raw_input("Please enter CRT number: ")
 
 #Just in case the user enters it as 'L12345.triage'
-if not ".triage" in filename:
-	filename = filename+ ".triage"
+if not ".triage.txt" in filename:
+	filename = filename+ ".triage.txt"
 
 #Create the triage file
 txtfile = open(filename, "w")
@@ -179,11 +179,11 @@ try:
 	osversion = osversion.splitlines()
 	for line in osversion:
 		if "RELEASE" in line:
-			os = line
+			oss = line
 	print "--------------------------"
 	txtfile.write("--------------------------\n")
-	print "Final Ubuntu OS: " + os.replace("DISTRIB_RELEASE=","")
-	txtfile.write("Final Ubuntu OS: " + os.replace("DISTRIB_RELEASE=","")+ "\n")
+	print "Final Ubuntu OS: " + oss.replace("DISTRIB_RELEASE=","")
+	txtfile.write("Final Ubuntu OS: " + oss.replace("DISTRIB_RELEASE=","")+ "\n")
 except:
 	print "Not an ubuntu os, tell Kevin. Program exiting!"
 	exit
@@ -230,14 +230,20 @@ else:
 	
 print "--------------------------"
 txtfile.write("--------------------------\n")
+
+osbittype = subprocess.check_output(['uname', '-m'])
+if 'i686' in osbittype:
+	print "OS type 32X/32Lite"
+	txtfile.write("OS type 32X/32Lite\n")
+else:
+	print "OS type x86_64"
+	txtfile.write("OS type x86_64\n")
+
+print "--------------------------"
+txtfile.write("--------------------------\n")
 txtfile.close()
-
-#The following command basically gives you a bash shell
-#anything in " " will get executed as if you typed it into the terminal
-
-#Here is the command taken from your email with the quotes/everything working
-#I cannot test it here but maybe you can
-#192.168.1.28 is for my house, testing locally, please ignore
-#os.system("lftp -e \"cd /Public/triage/;put "+filename+";exit\" 192.168.1.28")
-os.system("lftp -e \"cd /Public/triage/;put "+filename+";exit\" 10.0.88.5")
+executeThis = " -e \'cd /Public/triage;put " + filename + ";exit\'"
+print executeThis
+os.system("lftp 10.0.88.5" + executeThis)
+#subprocess.call(['lftp', '10.0.88.5', executeThis]) 
 
