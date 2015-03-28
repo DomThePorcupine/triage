@@ -2,8 +2,18 @@
 import subprocess
 import sys
 import os
-#lftp is not installed by default
-subprocess.call(['sudo', 'apt-get', 'install', 'lftp'])
+
+#Check that lftp is installed
+try:
+	subprocess.check_ouput(['lftp','--version'])
+except:
+	subprocess.call(['sudo', 'apt-get', 'install', 'lftp'])
+#Check that dmidecode is installed
+try:
+	subprocess.check_output(['dmidecode', '--version'])
+except:
+	subprocess.call(['sudo', 'apt-get', 'install', 'dmidecode'])
+
 #Check if the triage sheet was entered as a command line argument
 if len(sys.argv) > 1:
 	filename = sys.argv[1]
@@ -17,16 +27,20 @@ if not ".triage.txt" in filename:
 #Create the triage file
 txtfile = open(filename, "w")
 
-#Check that dmidecode is installed
-try:
-	subprocess.check_output(['dmidecode', '--version'])
-except:
-	print "dmidecode is not currently installed on this computer"
-	print "this script requires it. Tell Kevin, program exiting"
-	exit
-
 print "--------------------------"
 txtfile.write("--------------------------\n")
+#After looking at some computers I have decided to add an extra part to this script
+#If the computer is not made by a main brand such as dell, ibm, hp, or lenovo
+#The script will suggest manually entering certain values
+#such as the serial number
+mainCheck = subprocess.check_output(['sudo','dmidecode','-t','system'])
+data = mainCheck.splitlines()
+for line in data:
+	if "Manufacturer" in line:
+		if not "Dell" in line or not "HP" in line or not "IBM" in line:
+			print "This computer seems to be a non common computer!"
+			print "It is suggested that you enter certain data manually!"
+			exit
 
 #parsing output of dmidecode for manufacturer, model, and Serial number
 manu = subprocess.check_output(['sudo', 'dmidecode', '-t', 'system'])
