@@ -9,18 +9,20 @@ class mainGUI(Tkinter.Tk):
 	def __init__(self, parent):
 		Tkinter.Tk.__init__(self, parent)
 		self.parent=parent
-		
 		self.initialize()
 		
 	def initialize(self):
-		self
-
+		button = Tkinter.Button(self,text="Click to begin!",command=self.OnButtonClick)
+		button.grid(column=0,row=0)
 	def OnButtonClick(self):
-		subprocess.call(['xterm', '-e',"\"sudo python2 guifrontend.py\""])	
+		self.destroy()
+		
+			
+		
 		
 	
 if __name__ == "__main__":	
 	app = mainGUI(None)
-	app.title("Triage Program")
+	app.title("Triage Laucncher")
 	app.mainloop()
-	
+	os.system("xterm -e \"sudo python2 guifrontend.py & sleep 5 & exit\"")

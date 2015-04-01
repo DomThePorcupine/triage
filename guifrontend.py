@@ -242,7 +242,7 @@ class mainGUI(Tkinter.Tk):
 				return "Processor speed:\t" + line.replace("Max Speed: ","")
 				
 	def OnButtonClick(self):
-		subprocess.call(['xterm', '-e',"\"sudo echo \"hello\"\""])	
+		#subprocess.call(['xterm', '-e',"\"sudo echo \"hello\"\""])	
 		self.checkTriage()
 		self.cddvd.set(self.cdCheck())
 		self.osbit.set(self.osBitCheck())
