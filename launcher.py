@@ -15,6 +15,7 @@ class mainGUI(Tkinter.Tk):
 		button = Tkinter.Button(self,text="Click to begin!",command=self.OnButtonClick)
 		button.grid(column=0,row=0)
 	def OnButtonClick(self):
+		os.system("xterm -e \"sudo python2 guifrontend.py\"")
 		self.destroy()
 		
 			
@@ -25,4 +26,4 @@ if __name__ == "__main__":
 	app = mainGUI(None)
 	app.title("Triage Laucncher")
 	app.mainloop()
-	os.system("xterm -e \"sudo python2 guifrontend.py & sleep 5 & exit\"")
+

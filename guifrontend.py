@@ -196,19 +196,18 @@ class mainGUI(Tkinter.Tk):
 		
 		try:
 			cdrom = subprocess.check_output(['cat', '/proc/sys/dev/cdrom/info'])
-			cdrom = cdrom.splitlines()
-			for line in cdrom:
-				if "play audio" in line and '1' in line:
-					CD=True
-				if "read DVD" in line and '1' in line:
-					DVD=True
-				if "write DVD-R" in line and '1' in line:
-					DVDR=True
-				if "write CD-RW" in line and '1' in line:
-					CDR=True
 		except:
-			return "N/A"
-			
+			return "CD/DVD Drive:\tN/A"	
+		cdrom = cdrom.splitlines()
+		for line in cdrom:
+			if "play audio" in line and '1' in line:
+				CD=True
+			if "read DVD" in line and '1' in line:
+				DVD=True
+			if "write DVD-R" in line and '1' in line:
+				DVDR=True
+			if "write CD-RW" in line and '1' in line:
+				CDR=True
 		if CD and not DVD:
 			return "CD/DVD Drive:\t\tCD"
 		if CD and DVD and not CDR and not DVDR:
@@ -224,7 +223,23 @@ class mainGUI(Tkinter.Tk):
 		if 'i686' in osbitc:
 			return "OS type:\t\t32X/32Lite"
 		else:
-			return "OS type:\t\t\tx86_64"
+			return "OS type:\t\tx86_64"
+	def manuCheck(self):
+		manu = subprocess.check_output(['sudo','dmidecode','-t','system']);
+		data = manu.splitlines()
+		for line in data:
+			if "Manufacturer" in line:
+				line = line.replace('\t','')
+				return line.replace(':',':\t')
+		
+	def serialCheck(self):
+		serial = subprocess.check_output(['sudo','dmidecode','-t','system'])
+		data = serial.splitlines()
+		for line in data:
+			if "Serial" in line:
+				line = line.replace('\t','')
+				return line.replace(':',':\t')
+	
 	def memCheck(self):
 		raminfo = subprocess.check_output(['cat', '/proc/meminfo'])
 		raminfo = raminfo.splitlines()
@@ -233,13 +248,40 @@ class mainGUI(Tkinter.Tk):
 		raminfo = raminfo.replace("MemTotal:","")
 		return "Memory:\t\t" + str(int(raminfo)/1000) + " MB"
 		
-	def prosCheck(self):
+	def protsCheck(self):
 		processor = subprocess.check_output(['sudo', 'dmidecode', '-t', 'processor'])
 		processor = processor.splitlines()
 		for line in processor:
 			if "Max Speed" in line:
 				line = line.replace('\t','')
 				return "Processor speed:\t" + line.replace("Max Speed: ","")
+	def hddCheck(self):
+		hddsize = subprocess.check_output(['sudo','fdisk','-l'])
+		hddsize = hddsize.splitlines()
+		for line in hddsize:
+			if "Disk /dev/sda" in line:
+				data2 = line
+		data2 = data2.split(" ")
+		return "Hard Drive:\t" + data2[2] + " GB"
+	def portCheck(self):
+		PS2=False
+		ps = subprocess.check_output(['sudo', 'dmidecode'])
+		ps = ps.splitlines()
+		for line in ps:
+			if "PS/2" in line:
+				PS2=True
+		returnString = ""
+		data = subprocess.check_output(['lspci'])
+		data = data.splitlines()
+		for line in data:
+			if "USB controller" in line:
+				returnString = "USB"
+			if "Ethernet controller" in line:
+				returnString = returnString + "\Ethernet"
+			if PS2: 
+				returnString = returnString + "\PS/2"
+
+		return "Ports:\t" + returnString
 				
 	def OnButtonClick(self):
 		#subprocess.call(['xterm', '-e',"\"sudo echo \"hello\"\""])	
@@ -247,9 +289,11 @@ class mainGUI(Tkinter.Tk):
 		self.cddvd.set(self.cdCheck())
 		self.osbit.set(self.osBitCheck())
 		self.ram.set(self.memCheck())
-		self.processor.set(self.prosCheck())
-		
-	
+		self.processor.set(self.protsCheck())
+		self.manufacturer.set(self.manuCheck())
+		self.serial.set(self.serialCheck())
+		self.hdd.set(self.hddCheck())
+		self.port.set(self.portCheck())	
 if __name__ == "__main__":	
 	app = mainGUI(None)
 	app.title("Triage Program")
