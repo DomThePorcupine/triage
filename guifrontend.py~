@@ -284,6 +284,7 @@ class mainGUI(Tkinter.Tk):
 		return "Ports:\t" + returnString
 				
 	def OnButtonClick(self):
+		#subprocess.call(['xterm', '-e',"\"sudo echo \"hello\"\""])	
 		self.checkTriage()
 		self.cddvd.set(self.cdCheck())
 		self.osbit.set(self.osBitCheck())
