@@ -273,6 +273,10 @@ else:
 
 print "--------------------------"
 txtfile.write("--------------------------\n")
+
+aString = raw_input("Please enter any other comments: ")
+txtfile.write("Comments:\n")
+txtfile.write(aString)
 txtfile.close()
 executeThis = " -e \'cd /Public/triage;put " + filename + ";exit\'"
 print executeThis

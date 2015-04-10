@@ -184,9 +184,11 @@ class mainGUI(Tkinter.Tk):
 			#fileExistsPopUp
 		if self.theNumber.get() == "":
 			self.numPopUp()
-			
 		elif self.linux.get() == self.mac.get():
 			self.cpuPopUp()
+		if self.theNumber.get() != "" and self.linux.get() != self.mac.get():
+			
+			
 			
 	def cdCheck(self):
 		CD=False
@@ -284,7 +286,6 @@ class mainGUI(Tkinter.Tk):
 		return "Ports:\t" + returnString
 				
 	def OnButtonClick(self):
-		#subprocess.call(['xterm', '-e',"\"sudo echo \"hello\"\""])	
 		self.checkTriage()
 		self.cddvd.set(self.cdCheck())
 		self.osbit.set(self.osBitCheck())

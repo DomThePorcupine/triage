@@ -61,6 +61,9 @@ DVI = False
 HDMI = False
 PS2 = False
 WIFI = False
+#other ports
+MIC = False
+HEAD = False
 #add firewire
 
 #parsing lspci for hardware devices
@@ -76,6 +79,10 @@ for line in data:
 			ETHERNET = True
 		if "PS/2" in line:
 			PS2 = True
+		if "Headphone" in line:
+			HEAD = True
+		if "Microphone" in line:
+			MIC = True
 		#NEEDS TESTED
 		if "DVI" in line:
 			DVI = True
@@ -120,6 +127,16 @@ if USB:
 if PS2:
 	print "-PS/2"
 	txtfile.write("-PS/2\n")
+print "--------------------------"
+txtfile.write("--------------------------\n")
+print "Other Ports:"
+txtfile.write("Other Ports:\n")
+if HEAD:
+	print "-Headphones port"
+	txtfile.write("-Headphones port\n")
+if MIC:
+	print "-Microphone port"
+	txtfile.write("-Microphone port\n")
 	
 print "--------------------------"
 txtfile.write("--------------------------\n")

@@ -184,9 +184,11 @@ class mainGUI(Tkinter.Tk):
 			#fileExistsPopUp
 		if self.theNumber.get() == "":
 			self.numPopUp()
-			
 		elif self.linux.get() == self.mac.get():
 			self.cpuPopUp()
+		if self.theNumber.get() != "" and self.linux.get() != self.mac.get():
+			return "L" + theNumber.get()
+			
 			
 	def cdCheck(self):
 		CD=False
