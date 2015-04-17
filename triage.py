@@ -30,29 +30,29 @@ txtfile = open(filename, "w")
 #If the computer is not made by a main brand such as dell, ibm, hp, or lenovo
 #The script will suggest manually entering certain values
 #such as the serial number
-manuCheck = True
+
 
 #parsing output of dmidecode for manufacturer, model, and Serial number
-if manuCheck:
-	manu = subprocess.check_output(['sudo', 'dmidecode', '-t', 'system'])
-	data = manu.splitlines()
-	for line in data:
-		if "Manufacturer" in line:
-                        print "--------------------------"
-                        txtfile.write("--------------------------\n")
-			print line.replace('\t','')
-			txtfile.write(line.replace('\t','')+"\n")
-			print "--------------------------"
-			txtfile.write("--------------------------\n")
-		if "Version" in line:
-			line = line.replace('\t','')
-			print line.replace("Version", "Model")
-			txtfile.write(line.replace("Version", "Model")+ "\n")
-			print "--------------------------"
-			txtfile.write("--------------------------\n")
-		if "Serial" in line:
-			print line.replace('\t','')
-			txtfile.write(line.replace('\t','') + "\n")
+
+manu = subprocess.check_output(['sudo', 'dmidecode', '-t', 'system'])
+data = manu.splitlines()
+for line in data:
+	if "Manufacturer" in line:
+                print "--------------------------"
+                txtfile.write("--------------------------\n")
+		print line.replace('\t','')
+		txtfile.write(line.replace('\t','')+"\n")
+		print "--------------------------"
+		txtfile.write("--------------------------\n")
+	if "Version" in line:
+		line = line.replace('\t','')
+		print line.replace("Version", "Model")
+		txtfile.write(line.replace("Version", "Model")+ "\n")
+		print "--------------------------"
+		txtfile.write("--------------------------\n")
+	if "Serial" in line:
+		print line.replace('\t','')
+		txtfile.write(line.replace('\t','') + "\n")
 #variables for hardware devices
 USB = False
 ETHERNET = False
