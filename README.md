@@ -6,3 +6,6 @@ inventory automation and more efficeny.
 
 run ./launcher.py or for command line only run sudo ./triage.py
 
+
+I am moving toward triageC only please do not use the GUI it is broken
+
